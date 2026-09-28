@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 </head>
 <body>
-<title>동그라미 수학자 퀴즈</title>
+<title>이레 수학</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Pen+Script&display=swap">
@@ -58,6 +58,16 @@ h1 .o{position:relative; display:inline-block; color:var(--pen)}
 .who b{font-size:20px; font-weight:600}
 .who .yr{color:var(--muted); font-size:14px; font-variant-numeric:tabular-nums}
 .who p{margin:0; flex-basis:100%; color:var(--muted); font-size:15px}
+.who p strong{color:var(--ink); font-weight:600}
+.week{display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex-basis:100%}
+.week .range{font-size:20px; font-weight:600; font-variant-numeric:tabular-nums}
+.nav{
+  font:inherit; width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+  background:var(--card); color:var(--ink); cursor:pointer; font-size:14px;
+}
+.nav:disabled{opacity:.35; cursor:default}
+.badge{font-size:13px; border:1px solid var(--pen); color:var(--pen); border-radius:999px; padding:1px 10px; font-weight:500}
+.streak{font-family:var(--hand); font-size:24px; color:var(--pen); margin-left:auto}
 
 .dots{display:flex; flex-wrap:wrap; gap:6px}
 .dot{
@@ -134,8 +144,8 @@ mjx-container{color:inherit}
 <div class="wrap">
   <header>
     <span class="eyebrow">고등 수학 · 수학자별 퀴즈</span>
-    <h1>동그라미 수학자 퀴즈</h1>
-    <p class="lead">수학자를 고르고 한 문제씩 풀어요. 바로 채점하고, 틀린 문제는 오답노트에 모입니다.</p>
+    <h1>이레 수학</h1>
+    <p class="lead">매주 월요일 새 수학자 두 명의 문제가 나와요. 바로 채점하고, 틀린 문제는 오답노트에 모입니다.</p>
   </header>
 
   <nav class="chips" id="chips" aria-label="수학자 선택"></nav>
@@ -513,7 +523,44 @@ const STORE = 'dongeurami-mathematicians-wrong';
 const byId = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
 const $ = s => document.querySelector(s);
 
-let filter = '탈레스';
+// ── 이번 주의 수학자 (한국 시간 월요일마다 바뀜) ──
+const WEEK_PEOPLE = 2;                 // 한 주에 나오는 수학자 수
+const EPOCH_MONDAY = '2025-12-29';     // 기준 월요일
+const STORE_DONE = 'dongeurami-mathematicians-weeks';
+function kstToday() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+function toUTC(d) { const [y, m, dd] = d.split('-').map(Number); return Date.UTC(y, m - 1, dd); }
+function addDays(d, n) { return new Date(toUTC(d) + n * 864e5).toISOString().slice(0, 10); }
+function mondayOf(d) { return addDays(d, -((new Date(toUTC(d)).getUTCDay() + 6) % 7)); }
+function md(d) { const dt = new Date(toUTC(d)); return `${dt.getUTCMonth() + 1}월 ${dt.getUTCDate()}일`; }
+function hash(str) { let h = 2166136261; for (const ch of str) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) {
+  let a = hash(String(seed));
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function shuffle(arr, rand) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+// 한 바퀴(16명 ÷ 2명 = 8주) 동안 같은 수학자가 다시 나오지 않고, 바퀴마다 순서를 새로 섞음
+function weekPeople(monday) {
+  const names = Object.keys(PEOPLE);
+  const perCycle = Math.floor(names.length / WEEK_PEOPLE);
+  const w = Math.round((toUTC(monday) - toUTC(EPOCH_MONDAY)) / (7 * 864e5));
+  const cycle = Math.floor(w / perCycle), pos = ((w % perCycle) + perCycle) % perCycle;
+  return shuffle(names, rng(`math-week-cycle-${cycle}`)).slice(pos * WEEK_PEOPLE, pos * WEEK_PEOPLE + WEEK_PEOPLE);
+}
+function loadDone() { try { return JSON.parse(localStorage.getItem(STORE_DONE) || '{}'); } catch { return {}; } }
+function saveDone(obj) { try { localStorage.setItem(STORE_DONE, JSON.stringify(obj)); } catch {} }
+function weekStreak() {
+  const done = loadDone();
+  let w = done[THIS_WEEK] ? THIS_WEEK : addDays(THIS_WEEK, -7), n = 0;
+  while (done[w]) { n++; w = addDays(w, -7); }
+  return n;
+}
+const THIS_WEEK = mondayOf(kstToday());
+
+let filter = '이번 주';
+let viewWeek = THIS_WEEK;
+let retrying = false; // '틀린 문제만 다시'일 때는 그 주 점수를 덮어쓰지 않음
 let deck = [];
 let idx = 0;
 let results = {};
@@ -536,14 +583,30 @@ function typeset(el) {
 
 function renderChips() {
   const wrong = loadWrong();
-  const opts = ['전체', ...Object.keys(PEOPLE), '오답노트'];
+  const opts = ['이번 주', '전체', ...Object.keys(PEOPLE), '오답노트'];
   $('#chips').innerHTML = opts.map(o => {
-    const n = o === '전체' ? QUESTIONS.length : o === '오답노트' ? wrong.size : QUESTIONS.filter(q => q.who === o).length;
+    const n = o === '이번 주' ? deckFor('이번 주').length : o === '전체' ? QUESTIONS.length : o === '오답노트' ? wrong.size : QUESTIONS.filter(q => q.who === o).length;
     return `<button class="chip" type="button" data-f="${o}" aria-pressed="${o === filter}">${o}<span class="n">${n}</span></button>`;
   }).join('');
 }
 
 function renderWho() {
+  if (filter === '이번 주') {
+    const names = weekPeople(viewWeek);
+    const done = loadDone()[viewWeek];
+    const s = weekStreak();
+    $('#who').innerHTML = `
+      <div class="week">
+        <button class="nav" type="button" data-act="prev-week" aria-label="지난주 문제">◀</button>
+        <span class="range">${md(viewWeek)} ~ ${md(addDays(viewWeek, 6))}</span>
+        <button class="nav" type="button" data-act="next-week" aria-label="다음 주 문제" ${viewWeek >= THIS_WEEK ? 'disabled' : ''}>▶</button>
+        ${done ? `<span class="badge">완료 ${done.right}/${done.total}</span>` : ''}
+        ${s ? `<span class="streak">연속 ${s}주</span>` : ''}
+      </div>
+      <b>${viewWeek === THIS_WEEK ? '이번 주' : '그 주'}의 수학자: ${names.join(' · ')}</b>
+      ${names.map(n => `<p><strong>${n}</strong> (${PEOPLE[n].yr}) ${PEOPLE[n].intro}</p>`).join('')}`;
+    return;
+  }
   const p = PEOPLE[filter];
   $('#who').innerHTML = p
     ? `<b>${filter}</b><span class="yr">${p.yr}</span><p>${p.intro}</p>`
@@ -553,10 +616,11 @@ function renderWho() {
 }
 
 function startDeck(ids) {
-  deck = ids; idx = 0; results = {};
+  deck = ids; idx = 0; results = {}; retrying = false;
   renderChips(); renderWho(); render();
 }
 function deckFor(f) {
+  if (f === '이번 주') return weekPeople(viewWeek).flatMap(w => QUESTIONS.filter(q => q.who === w).map(q => q.id));
   if (f === '전체') return Object.keys(PEOPLE).flatMap(w => QUESTIONS.filter(q => q.who === w).map(q => q.id));
   if (f === '오답노트') return QUESTIONS.filter(q => loadWrong().has(q.id)).map(q => q.id);
   return QUESTIONS.filter(q => q.who === f).map(q => q.id);
@@ -632,8 +696,9 @@ function summaryHTML() {
   const msg = right === total ? '전부 맞혔어요. 다른 수학자에도 도전해 보세요.'
     : right / total >= 0.7 ? '잘했어요. 틀린 문제만 한 번 더 보세요.'
     : '해설을 읽고 다시 풀어 봐요.';
+  const tail = filter === '이번 주' && viewWeek === THIS_WEEK ? ' 다음 주 월요일에 새 수학자가 나와요.' : '';
   return `<article class="card">
-    <div class="score"><span class="big">${right} / ${total}${mark('ok')}</span><p>${msg}</p></div>
+    <div class="score"><span class="big">${right} / ${total}${mark('ok')}</span><p>${msg}${tail}</p></div>
     ${wrongIds.length ? `<ul class="wrong-list">${wrongIds.map(id => {
       const q = byId[id];
       return `<li><div class="meta"><span>${q.who}</span><span>·</span><span>${q.unit}</span></div>${q.q}</li>`;
@@ -659,6 +724,12 @@ function answer(value) {
   const wrong = loadWrong();
   correct ? wrong.delete(q.id) : wrong.add(q.id);
   saveWrong(wrong);
+  if (filter === '이번 주' && !retrying && deck.every(id => results[id])) {
+    const done = loadDone();
+    done[viewWeek] = { right: deck.filter(id => results[id].correct).length, total: deck.length };
+    saveDone(done);
+    renderWho();
+  }
   renderChips();
   render();
   $('#next-btn')?.focus({ preventScroll: true });
@@ -672,13 +743,15 @@ function next() {
 
 document.addEventListener('click', e => {
   const chip = e.target.closest('[data-f]');
-  if (chip) { filter = chip.dataset.f; startDeck(deckFor(filter)); return; }
+  if (chip) { filter = chip.dataset.f; viewWeek = THIS_WEEK; startDeck(deckFor(filter)); return; }
   const pick = e.target.closest('[data-pick]');
   if (pick && !pick.disabled) { answer(Number(pick.dataset.pick)); return; }
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'next') next();
   if (act === 'restart') startDeck(deckFor(filter));
-  if (act === 'retry-wrong') startDeck(deck.filter(id => !results[id]?.correct));
+  if (act === 'retry-wrong') { startDeck(deck.filter(id => !results[id]?.correct)); retrying = true; }
+  if (act === 'prev-week') { viewWeek = addDays(viewWeek, -7); startDeck(deckFor(filter)); }
+  if (act === 'next-week' && viewWeek < THIS_WEEK) { viewWeek = addDays(viewWeek, 7); startDeck(deckFor(filter)); }
   if (act === 'all') { filter = '전체'; startDeck(deckFor(filter)); }
 });
 

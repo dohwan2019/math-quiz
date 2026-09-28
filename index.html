@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>동그라미 수학자 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Pen+Script&display=swap">
+<style>
+:root{
+  --paper:#F6F8FB; --grid:#E3E9F1; --card:#FFFFFF; --ink:#18212E; --muted:#5A6576;
+  --line:#D6DEE8; --pen:#D2372A; --pen-soft:#FCEAE7; --sel:#2B4C8C; --sel-soft:#E8EDF7;
+  --btn-ink:#FFFFFF;
+  --body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --hand:"Nanum Pen Script", "IBM Plex Sans KR", cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#10151D; --grid:#18202A; --card:#161D27; --ink:#E4EAF2; --muted:#98A4B5;
+    --line:#2A3441; --pen:#FF6B5D; --pen-soft:#3A201D; --sel:#93B2F0; --sel-soft:#1C283C;
+    --btn-ink:#10151D;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#10151D; --grid:#18202A; --card:#161D27; --ink:#E4EAF2; --muted:#98A4B5;
+  --line:#2A3441; --pen:#FF6B5D; --pen-soft:#3A201D; --sel:#93B2F0; --sel-soft:#1C283C;
+  --btn-ink:#10151D;
+}
+*{box-sizing:border-box}
+body{
+  font-family:var(--body); color:var(--ink); background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; font-size:16px; line-height:1.6;
+  padding-inline:16px; padding-block:24px 48px; min-height:100vh;
+}
+.wrap{max-width:680px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+header{display:flex; flex-direction:column; gap:4px}
+.eyebrow{font-size:13px; letter-spacing:.06em; color:var(--muted); font-weight:500}
+h1{font-family:var(--hand); font-weight:400; font-size:48px; line-height:1.05; margin:0; text-wrap:balance}
+h1 .o{position:relative; display:inline-block; color:var(--pen)}
+.lead{margin:0; color:var(--muted); font-size:15px}
+
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{
+  font:inherit; font-size:14px; font-weight:500; color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:999px; padding:6px 14px; cursor:pointer;
+}
+.chip:hover{border-color:var(--sel)}
+.chip[aria-pressed="true"]{background:var(--ink); color:var(--card); border-color:var(--ink)}
+.chip .n{font-size:12px; opacity:.7; margin-left:4px; font-variant-numeric:tabular-nums}
+
+.who{display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; padding-inline:2px}
+.who b{font-size:20px; font-weight:600}
+.who .yr{color:var(--muted); font-size:14px; font-variant-numeric:tabular-nums}
+.who p{margin:0; flex-basis:100%; color:var(--muted); font-size:15px}
+
+.dots{display:flex; flex-wrap:wrap; gap:6px}
+.dot{
+  width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:var(--card);
+  font-size:12px; display:grid; place-items:center; color:var(--muted); position:relative;
+  font-variant-numeric:tabular-nums;
+}
+.dot.now{border:2px solid var(--sel); color:var(--sel); font-weight:600}
+.dot.ok{border-color:var(--pen); color:var(--pen); font-weight:600}
+.dot.no{color:var(--muted); background:var(--paper)}
+.dot.no::after{content:""; position:absolute; width:2px; height:30px; background:var(--pen); transform:rotate(40deg); border-radius:2px}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 20px; display:flex; flex-direction:column; gap:18px}
+.qhead{display:flex; gap:14px; align-items:flex-start}
+.qnum{position:relative; flex:none; width:52px; height:52px; display:grid; place-items:center; font-size:24px; font-weight:600; font-variant-numeric:tabular-nums}
+.meta{font-size:13px; color:var(--muted); letter-spacing:.02em; display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+.tag{border:1px solid var(--line); border-radius:6px; padding:0 7px; font-size:12px}
+.qtext{font-size:17px; margin:4px 0 0; word-break:keep-all}
+
+.mark{position:absolute; inset:-6px; width:calc(100% + 12px); height:calc(100% + 12px); pointer-events:none; overflow:visible}
+.mark path{fill:none; stroke:var(--pen); stroke-width:4; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:1; animation:draw .45s ease-out forwards}
+.mark.small path{stroke-width:6}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.choices{display:grid; gap:8px; list-style:none; margin:0; padding:0}
+.choice{
+  width:100%; text-align:left; font:inherit; color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:10px; padding:10px 14px; cursor:pointer;
+  display:flex; gap:12px; align-items:center; min-height:48px;
+}
+.choice:hover:not(:disabled){background:var(--sel-soft); border-color:var(--sel)}
+.choice:disabled{cursor:default}
+.choice .lab{position:relative; flex:none; width:26px; height:26px; display:grid; place-items:center; font-size:18px; color:var(--muted)}
+.choice.right{border-color:var(--pen); background:var(--pen-soft)}
+.choice.right .lab{color:var(--pen)}
+.choice.picked-wrong{color:var(--muted)}
+.choice.dim{opacity:.55}
+
+.short{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.short input{
+  font:inherit; font-size:18px; width:140px; padding:8px 12px; border-radius:10px;
+  border:1px solid var(--line); background:var(--paper); color:var(--ink); font-variant-numeric:tabular-nums;
+}
+.short input:focus-visible{outline:2px solid var(--sel); outline-offset:1px}
+.short .hint{font-size:13px; color:var(--muted); flex-basis:100%}
+
+.btn{
+  font:inherit; font-weight:600; font-size:15px; border-radius:10px; padding:10px 18px; cursor:pointer;
+  border:1px solid var(--ink); background:var(--ink); color:var(--btn-ink);
+}
+.btn.ghost{background:transparent; color:var(--ink); border-color:var(--line)}
+.btn:disabled{opacity:.4; cursor:default}
+button:focus-visible{outline:2px solid var(--sel); outline-offset:2px}
+
+.verdict{font-family:var(--hand); font-size:32px; line-height:1.1; margin:0}
+.verdict.ok{color:var(--pen)}
+.sol{background:var(--paper); border-radius:10px; padding:14px 16px; font-size:15px; word-break:keep-all}
+.sol .k{display:block; font-size:12px; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:4px}
+.row{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+
+.score{display:flex; flex-direction:column; align-items:center; gap:4px; padding-block:8px}
+.score .big{position:relative; font-family:var(--hand); font-size:72px; line-height:1; padding:10px 28px; color:var(--pen); font-variant-numeric:tabular-nums}
+.score p{margin:0; color:var(--muted)}
+.wrong-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+.wrong-list li{border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:15px; word-break:keep-all}
+.wrong-list .meta{margin-bottom:2px}
+.empty{color:var(--muted); margin:0}
+footer{font-size:13px; color:var(--muted); text-align:center}
+mjx-container{color:inherit}
+@media (prefers-reduced-motion: reduce){ .mark path{animation:none; stroke-dashoffset:0} }
+@media (max-width:420px){ h1{font-size:42px} .card{padding:18px 16px} }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">고등 수학 · 수학자별 퀴즈</span>
+    <h1>동그라미 수학자 퀴즈</h1>
+    <p class="lead">수학자를 고르고 한 문제씩 풀어요. 바로 채점하고, 틀린 문제는 오답노트에 모입니다.</p>
+  </header>
+
+  <nav class="chips" id="chips" aria-label="수학자 선택"></nav>
+  <section class="who" id="who" aria-live="polite"></section>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <main id="stage"></main>
+  <footer>숫자 키 1~5로 보기 선택, Enter로 다음 문제</footer>
+</div>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$']] },
+  svg: { fontCache: 'global' },
+  startup: {
+    typeset: false,
+    ready() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(() => typeset(document.body));
+    }
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<script>
+const r = String.raw;
+
+// 시대순. 버튼과 '전체' 문제 순서가 이 순서를 따릅니다.
+const PEOPLE = {
+  '탈레스':       { yr: '기원전 624?–546?', intro: '증명을 처음 시도한 ‘최초의 수학자’로 불리는 고대 그리스 사람.' },
+  '피타고라스':   { yr: '기원전 570?–495?', intro: '만물의 근원은 수라고 믿은 고대 그리스 학파의 창시자.' },
+  '유클리드':     { yr: '기원전 300년경', intro: '기하학을 정의와 공리로 쌓아 올린 알렉산드리아의 수학자.' },
+  '아르키메데스': { yr: '기원전 287?–212', intro: '원주율을 계산하고 구의 부피를 구한 고대 그리스 수학자.' },
+  '에라토스테네스': { yr: '기원전 276?–194?', intro: '지리학자이자 도서관장. 그림자로 지구의 크기를 잰 학자.' },
+  '피보나치':     { yr: '1170?–1250?', intro: '인도-아라비아 숫자를 유럽에 널리 알린 이탈리아 수학자.' },
+  '네이피어':     { yr: '1550–1617', intro: '복잡한 곱셈을 덧셈으로 바꾸는 방법을 찾은 스코틀랜드 수학자.' },
+  '데카르트':     { yr: '1596–1650', intro: '좌표평면을 만들어 도형을 식으로 다루게 한 프랑스 철학자.' },
+  '페르마':       { yr: '1607?–1665', intro: '취미로 수학을 한 프랑스 사람. 책 여백의 메모가 350년 난제가 되었어요.' },
+  '파스칼':       { yr: '1623–1662', intro: '계산기를 발명하고 조합과 확률의 기초를 놓은 프랑스 수학자.' },
+  '뉴턴':         { yr: '1643–1727', intro: '미적분과 만유인력의 법칙을 세운 영국 과학자.' },
+  '라이프니츠':   { yr: '1646–1716', intro: '미적분 기호와 이진법을 연구한 독일 철학자이자 수학자.' },
+  '최석정':       { yr: '1646–1715', intro: '조선 숙종 때 영의정을 지낸 문신이자 수학자.' },
+  '오일러':       { yr: '1707–1783', intro: 'e, i, f(x), Σ 같은 기호를 널리 쓰이게 한 스위스 수학자.' },
+  '가우스':       { yr: '1777–1855', intro: '‘수학의 왕’이라 불린 독일 수학자. 어린 시절부터 계산 천재로 유명했어요.' },
+  '라마누잔':     { yr: '1887–1920', intro: '정규 교육 없이 수많은 공식을 찾아낸 인도의 천재 수학자.' },
+};
+
+// type: 'mc'(5지선다, ans는 0부터) | 'short'(단답형, ans는 숫자)
+const QUESTIONS = [
+  { id:'g1', who:'가우스', kind:'이야기+계산', unit:'수열', type:'short', ans:5050,
+    q:r`어린 가우스는 선생님이 낸 문제를 순식간에 풀었다고 합니다. $1+2+3+\cdots+100$의 값은?`,
+    sol:r`앞뒤를 짝지으면 $1+100=2+99=\cdots=101$이 $50$쌍이므로 $101\times50=5050$` },
+  { id:'g2', who:'가우스', kind:'계산', unit:'가우스 기호', type:'mc', ans:0,
+    q:r`$[x]$는 $x$보다 크지 않은 최대의 정수입니다(가우스 기호). $[-2.5]$의 값은?`,
+    choices:['-3','-2.5','-2','2','3'],
+    sol:r`$-2.5$보다 크지 않은 정수는 $-3, -4, \dots$이고 그중 최대는 $-3$. 음수에서 $-2$로 착각하기 쉬워요.` },
+  { id:'g3', who:'가우스', kind:'이야기', unit:'수학사', type:'mc', ans:4,
+    q:r`가우스는 19세에 자와 컴퍼스만으로 작도할 수 있는 정다각형을 새로 찾아냈습니다. 어떤 도형일까요?`,
+    choices:['정7각형','정9각형','정11각형','정13각형','정17각형'],
+    sol:r`1796년 가우스는 정17각형의 작도법을 발견했어요. 이 발견으로 수학자의 길을 택했다고 합니다.` },
+
+  { id:'e1', who:'오일러', kind:'계산', unit:'다면체', type:'short', ans:8,
+    q:r`볼록다면체에서는 (꼭짓점 수) $-$ (모서리 수) $+$ (면의 수) $=2$가 성립합니다(오일러 공식). 꼭짓점이 $6$개, 모서리가 $12$개인 정다면체의 면의 수는?`,
+    sol:r`$6-12+F=2$이므로 $F=8$. 정팔면체예요.` },
+  { id:'e2', who:'오일러', kind:'이야기', unit:'수학사', type:'mc', ans:1,
+    q:r`‘가장 아름다운 수식’으로 불리는 오일러 등식입니다. $e^{i\pi}+1$의 값은?`,
+    choices:['-1','0','1',r`$e$`,r`$\pi$`],
+    sol:r`$e^{i\pi}=-1$이므로 $e^{i\pi}+1=0$. 수학의 중요한 상수 $e, i, \pi, 1, 0$이 한 식에 모여 있어요.` },
+  { id:'e3', who:'오일러', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`오일러는 한 도시의 다리 7개를 모두 한 번씩만 건너는 산책길은 없다는 것을 증명했습니다. 이 도시는?`,
+    choices:['쾨니히스베르크','베를린','바젤','상트페테르부르크','파리'],
+    sol:r`쾨니히스베르크의 다리 문제는 그래프 이론의 출발점이에요. 바젤은 오일러의 고향, 베를린과 상트페테르부르크는 그가 일한 도시입니다.` },
+
+  { id:'p1', who:'피타고라스', kind:'계산', unit:'도형의 방정식', type:'short', ans:5,
+    q:r`좌표평면 위의 두 점 $\mathrm{A}(1,\,2)$, $\mathrm{B}(4,\,6)$ 사이의 거리는?`,
+    sol:r`피타고라스 정리로 $\sqrt{(4-1)^2+(6-2)^2}=\sqrt{9+16}=5$` },
+  { id:'p2', who:'피타고라스', kind:'계산', unit:'피타고라스 정리', type:'mc', ans:1,
+    q:r`세 변의 길이가 다음과 같을 때 직각삼각형이 되는 것은?`,
+    choices:['2, 3, 4','5, 12, 13','6, 8, 9','7, 8, 10','4, 6, 8'],
+    sol:r`$5^2+12^2=25+144=169=13^2$이므로 직각삼각형이에요.` },
+  { id:'p3', who:'피타고라스', kind:'이야기', unit:'수학사', type:'mc', ans:2,
+    q:r`피타고라스학파는 ‘모든 수는 정수의 비로 나타낼 수 있다’고 믿었습니다. 이 믿음을 깨뜨린 수는?`,
+    choices:[r`$\frac{1}{3}$`,r`$0.25$`,r`$\sqrt{2}$`,r`$\sqrt{4}$`,r`$-5$`],
+    sol:r`한 변이 $1$인 정사각형의 대각선 길이 $\sqrt{2}$는 정수의 비로 나타낼 수 없는 무리수예요. $\sqrt{4}=2$는 유리수입니다.` },
+
+  { id:'f1', who:'페르마', kind:'이야기', unit:'수학사', type:'mc', ans:2,
+    q:r`$n\ge3$일 때 $x^n+y^n=z^n$을 만족하는 자연수 $x, y, z$는 없다는 ‘페르마의 마지막 정리’. 약 350년 만에 이를 증명한 사람은?`,
+    choices:['가우스','오일러','앤드루 와일스','힐베르트','페렐만'],
+    sol:r`영국 수학자 앤드루 와일스가 1994년에 증명을 완성했어요. 페르마는 ‘여백이 좁아 증명을 적지 않는다’는 메모만 남겼습니다.` },
+  { id:'f2', who:'페르마', kind:'계산', unit:'지수', type:'short', ans:1,
+    q:r`$2^6$을 $7$로 나눈 나머지는? (페르마의 소정리를 확인해 보세요)`,
+    sol:r`$2^6=64=7\times9+1$이므로 나머지는 $1$. 소수 $p$에 대해 $a^{p-1}$을 $p$로 나눈 나머지가 $1$이라는 것이 페르마의 소정리예요.` },
+  { id:'f3', who:'페르마', kind:'계산', unit:'지수', type:'short', ans:17,
+    q:r`페르마 수는 $F_n=2^{2^n}+1$로 정의합니다. $F_2$의 값은?`,
+    sol:r`$2^{2^2}=2^4=16$이므로 $F_2=17$` },
+
+  { id:'pa1', who:'파스칼', kind:'계산', unit:'이항정리', type:'short', ans:15,
+    q:r`$(a+b)^6$의 전개식에서 $a^4b^2$의 계수는?`,
+    sol:r`$_{6}\mathrm{C}_{2}=\frac{6\times5}{2}=15$. 파스칼의 삼각형 7번째 줄 $1, 6, 15, 20, 15, 6, 1$에서도 확인할 수 있어요.` },
+  { id:'pa2', who:'파스칼', kind:'계산', unit:'경우의 수', type:'mc', ans:2,
+    q:r`$_{9}\mathrm{C}_{3}+{}_{9}\mathrm{C}_{4}$와 값이 같은 것은?`,
+    choices:[r`$_{9}\mathrm{C}_{7}$`,r`$_{10}\mathrm{C}_{3}$`,r`$_{10}\mathrm{C}_{4}$`,r`$_{10}\mathrm{C}_{5}$`,r`$_{18}\mathrm{C}_{7}$`],
+    sol:r`파스칼의 삼각형 성질 $_{n}\mathrm{C}_{r-1}+{}_{n}\mathrm{C}_{r}={}_{n+1}\mathrm{C}_{r}$에 의해 $_{10}\mathrm{C}_{4}$. 실제로 $84+126=210$이에요.` },
+  { id:'pa3', who:'파스칼', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`파스칼은 1654년 도박 판돈 나누기 문제를 두고 한 수학자와 편지를 주고받으며 확률론의 기초를 세웠습니다. 이 수학자는?`,
+    choices:['페르마','뉴턴','오일러','가우스','데카르트'],
+    sol:r`파스칼과 페르마의 편지가 확률론의 출발점으로 꼽혀요.` },
+
+  { id:'d1', who:'데카르트', kind:'계산', unit:'도형의 방정식', type:'short', ans:3,
+    q:r`두 점 $\mathrm{A}(-1,\,3)$, $\mathrm{B}(5,\,-1)$의 중점의 좌표를 $(a,\,b)$라 할 때, $a+b$의 값은?`,
+    sol:r`중점은 $\left(\frac{-1+5}{2},\,\frac{3-1}{2}\right)=(2,\,1)$이므로 $a+b=3$` },
+  { id:'d2', who:'데카르트', kind:'계산', unit:'도형의 방정식', type:'mc', ans:1,
+    q:r`원 $x^2+y^2-4x+6y=0$의 반지름의 길이는?`,
+    choices:[r`$\sqrt{5}$`,r`$\sqrt{13}$`,r`$5$`,r`$\sqrt{10}$`,r`$13$`],
+    sol:r`$(x-2)^2+(y+3)^2=13$이므로 반지름은 $\sqrt{13}$` },
+  { id:'d3', who:'데카르트', kind:'이야기', unit:'수학사', type:'mc', ans:3,
+    q:r`철학자이기도 한 데카르트가 남긴 유명한 말은?`,
+    choices:['너 자신을 알라','아는 것이 힘이다','인간은 생각하는 갈대다','나는 생각한다, 그러므로 나는 존재한다','유레카!'],
+    sol:r`『방법서설』에 나오는 말이에요. ‘생각하는 갈대’는 파스칼, ‘유레카’는 아르키메데스와 관련 있어요.` },
+
+  { id:'n1', who:'뉴턴', kind:'이야기', unit:'수학사', type:'mc', ans:1,
+    q:r`뉴턴과 거의 같은 시기에 독립적으로 미적분을 만들어, 누가 먼저인지 큰 논쟁을 벌인 수학자는?`,
+    choices:['데카르트','라이프니츠','오일러','파스칼','갈릴레이'],
+    sol:r`라이프니츠예요. 오늘날 쓰는 $\frac{dy}{dx}$, $\int$ 기호는 라이프니츠가 만들었어요.` },
+  { id:'n2', who:'뉴턴', kind:'계산', unit:'미분', type:'short', ans:12,
+    q:r`함수 $f(x)=x^3$의 $x=2$에서의 순간변화율(미분계수)은?`,
+    sol:r`$f'(x)=3x^2$이므로 $f'(2)=12$` },
+  { id:'n3', who:'뉴턴', kind:'계산', unit:'적분', type:'short', ans:9,
+    q:r`$\displaystyle\int_0^3 2x\,dx$의 값은?`,
+    sol:r`$\left[x^2\right]_0^3=9-0=9$` },
+
+  { id:'a1', who:'아르키메데스', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`아르키메데스가 목욕탕에서 ‘유레카!’를 외치며 떠올린 방법으로 알아낸 것은?`,
+    choices:['왕관이 순금인지','지구의 둘레','원주율의 값','소수가 무한히 많은지','태양까지의 거리'],
+    sol:r`물에 잠긴 부피로 왕관의 순도를 확인하는 방법을 떠올렸다는 일화예요. 지구 둘레는 에라토스테네스, 소수의 무한성은 유클리드가 보였어요.` },
+  { id:'a2', who:'아르키메데스', kind:'계산', unit:'입체도형', type:'mc', ans:2,
+    q:r`반지름의 길이가 $3$인 구의 부피는?`,
+    choices:[r`$9\pi$`,r`$12\pi$`,r`$36\pi$`,r`$27\pi$`,r`$108\pi$`],
+    sol:r`$\frac{4}{3}\pi\times3^3=36\pi$. 아르키메데스는 구의 부피가 외접하는 원기둥 부피의 $\frac{2}{3}$임을 보이고, 이 그림을 묘비에 새겨 달라고 했대요.` },
+  { id:'a3', who:'아르키메데스', kind:'계산', unit:'입체도형', type:'mc', ans:1,
+    q:r`반지름의 길이가 $2$인 구의 겉넓이는?`,
+    choices:[r`$8\pi$`,r`$16\pi$`,r`$\frac{32}{3}\pi$`,r`$4\pi$`,r`$64\pi$`],
+    sol:r`$4\pi r^2=4\pi\times2^2=16\pi$` },
+
+  { id:'t1', who:'탈레스', kind:'이야기+계산', unit:'닮음', type:'short', ans:145,
+    q:r`탈레스는 그림자로 피라미드의 높이를 쟀다고 합니다. 길이 $1\,\mathrm{m}$인 막대의 그림자가 $2\,\mathrm{m}$일 때, 피라미드의 그림자가 $290\,\mathrm{m}$였다면 피라미드의 높이는 몇 $\mathrm{m}$일까요?`,
+    sol:r`햇빛이 같은 각도로 비추므로 닮음비가 같아요. $1:2=h:290$이므로 $h=145$` },
+  { id:'t2', who:'탈레스', kind:'계산', unit:'원의 성질', type:'mc', ans:3,
+    q:r`원의 지름의 양 끝 $\mathrm{A}$, $\mathrm{B}$와 원 위의 다른 한 점 $\mathrm{P}$에 대하여 $\angle\mathrm{APB}$의 크기는? (탈레스의 정리)`,
+    choices:[r`$30^\circ$`,r`$45^\circ$`,r`$60^\circ$`,r`$90^\circ$`,r`$180^\circ$`],
+    sol:r`지름에 대한 원주각은 항상 $90^\circ$예요. 중심각 $180^\circ$의 절반입니다.` },
+  { id:'t3', who:'탈레스', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`역사가 헤로도토스에 따르면 탈레스는 기원전 585년에 일어난 한 자연현상을 예언했다고 합니다. 무엇일까요?`,
+    choices:['일식','지진','혜성','홍수','월식'],
+    sol:r`탈레스가 일식을 예언했다는 기록이 전해져요. 전쟁 중이던 두 나라가 일식을 보고 싸움을 멈췄다고 합니다.` },
+
+  { id:'u1', who:'유클리드', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`유클리드가 기하학을 정의, 공리, 증명으로 정리해 2000년 넘게 교과서로 쓰인 책은?`,
+    choices:['원론','프린키피아','방법서설','산반서','알마게스트'],
+    sol:r`『원론』은 13권으로 이루어진 책이에요. 『프린키피아』는 뉴턴, 『방법서설』은 데카르트, 『산반서』는 피보나치의 책입니다.` },
+  { id:'u2', who:'유클리드', kind:'계산', unit:'약수와 배수', type:'short', ans:12,
+    q:r`유클리드 호제법으로 $84$와 $36$의 최대공약수를 구하면?`,
+    sol:r`$84=36\times2+12$, $36=12\times3+0$이므로 최대공약수는 $12$` },
+  { id:'u3', who:'유클리드', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`유클리드가 『원론』에서 귀류법으로 증명한 사실은?`,
+    choices:['소수는 무한히 많다','원주율은 무리수다','2보다 큰 짝수는 두 소수의 합이다','5차방정식은 근의 공식이 없다','페르마의 마지막 정리'],
+    sol:r`소수가 유한하다고 가정하고 모두 곱해 $1$을 더하면 모순이 생긴다는 증명이에요. ‘두 소수의 합’은 아직 증명되지 않은 골드바흐 추측입니다.` },
+
+  { id:'er1', who:'에라토스테네스', kind:'이야기+계산', unit:'원과 부채꼴', type:'short', ans:50,
+    q:r`에라토스테네스는 두 도시에서 같은 날 정오에 잰 햇빛의 각도가 $7.2^\circ$ 차이 나는 것을 이용해 지구의 둘레를 구했습니다. $7.2^\circ$는 한 바퀴 $360^\circ$의 몇 분의 $1$일까요?`,
+    sol:r`$360\div7.2=50$. 그래서 두 도시 사이 거리의 $50$배가 지구의 둘레라고 계산했어요.` },
+  { id:'er2', who:'에라토스테네스', kind:'계산', unit:'소수', type:'short', ans:10,
+    q:r`에라토스테네스의 체로 $1$부터 $30$까지의 수 중 소수를 모두 찾으면 몇 개일까요?`,
+    sol:r`$2, 3, 5, 7, 11, 13, 17, 19, 23, 29$로 $10$개예요.` },
+  { id:'er3', who:'에라토스테네스', kind:'계산', unit:'소수', type:'mc', ans:1,
+    q:r`$1$부터 $100$까지의 수에서 에라토스테네스의 체로 소수를 찾을 때, 어느 소수의 배수까지 지우면 충분할까요?`,
+    choices:['5','7','11','47','97'],
+    sol:r`$\sqrt{100}=10$이므로 $10$ 이하의 소수 $2, 3, 5, 7$의 배수만 지우면 남은 수는 모두 소수예요.` },
+
+  { id:'fi1', who:'피보나치', kind:'계산', unit:'수열', type:'short', ans:55,
+    q:r`$1, 1, 2, 3, 5, 8, \cdots$처럼 앞의 두 항을 더해 다음 항을 만드는 피보나치 수열의 제$10$항은?`,
+    sol:r`$1, 1, 2, 3, 5, 8, 13, 21, 34, 55$이므로 제$10$항은 $55$` },
+  { id:'fi2', who:'피보나치', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`피보나치가 1202년에 써서 인도-아라비아 숫자를 유럽에 널리 알린 책은?`,
+    choices:['산반서','원론','프린키피아','구장산술','방법서설'],
+    sol:r`『산반서(Liber Abaci)』예요. 토끼 번식 문제로 피보나치 수열도 이 책에 소개됐어요.` },
+  { id:'fi3', who:'피보나치', kind:'계산', unit:'수열의 극한', type:'mc', ans:1,
+    q:r`피보나치 수열에서 이웃한 두 항의 비 $\frac{a_{n+1}}{a_n}$이 한없이 가까워지는 값은?`,
+    choices:[r`$\sqrt{2}$`,r`$\frac{1+\sqrt{5}}{2}$`,r`$\frac{\pi}{2}$`,r`$\frac{3}{2}$`,r`$\frac{e}{2}$`],
+    sol:r`황금비 $\frac{1+\sqrt{5}}{2}\approx1.618$에 가까워져요. $x^2=x+1$의 양의 근입니다.` },
+
+  { id:'na1', who:'네이피어', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`천문학의 복잡한 계산을 쉽게 하려고 네이피어가 1614년에 발표한 것은?`,
+    choices:['로그','미분','좌표평면','확률','복소수'],
+    sol:r`로그를 쓰면 곱셈을 덧셈으로 바꿀 수 있어서 계산 시간이 크게 줄었어요.` },
+  { id:'na2', who:'네이피어', kind:'계산', unit:'로그', type:'mc', ans:1,
+    q:r`$\log 2=0.3010$일 때, $\log 8$의 값은?`,
+    choices:['0.6020','0.9030','1.2040','0.0903','3.0100'],
+    sol:r`$\log 8=\log 2^3=3\log 2=0.9030$` },
+  { id:'na3', who:'네이피어', kind:'계산', unit:'로그', type:'short', ans:7,
+    q:r`$\log 2=0.3010$일 때, $2^{20}$은 몇 자리 자연수일까요?`,
+    sol:r`$\log 2^{20}=20\times0.3010=6.02$이므로 $10^6\le2^{20}<10^7$, $7$자리예요. 실제로 $2^{20}=1048576$입니다.` },
+
+  { id:'l1', who:'라이프니츠', kind:'계산', unit:'진법', type:'mc', ans:1,
+    q:r`라이프니츠는 $0$과 $1$만 쓰는 이진법을 연구했습니다. 십진법의 수 $13$을 이진법으로 나타내면?`,
+    choices:['1011','1101','1110','1001','1111'],
+    sol:r`$13=8+4+1=1\times2^3+1\times2^2+0\times2+1$이므로 $1101_{(2)}$` },
+  { id:'l2', who:'라이프니츠', kind:'계산', unit:'적분', type:'short', ans:7,
+    q:r`적분 기호 $\int$는 라이프니츠가 만들었습니다. $\displaystyle\int_1^2 3x^2\,dx$의 값은?`,
+    sol:r`$\left[x^3\right]_1^2=8-1=7$` },
+  { id:'l3', who:'라이프니츠', kind:'계산', unit:'미분', type:'short', ans:5,
+    q:r`라이프니츠의 기호로 $\frac{dy}{dx}$라고 씁니다. $y=x^2+3x$일 때, $x=1$에서 $\frac{dy}{dx}$의 값은?`,
+    sol:r`$\frac{dy}{dx}=2x+3$이므로 $x=1$일 때 $5$` },
+
+  { id:'c1', who:'최석정', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`최석정이 쓴 조선의 수학책으로, 마방진과 라틴방진이 실려 있는 책은?`,
+    choices:['구수략','구장산술','주해수용','산학계몽','원론'],
+    sol:r`『구수략』이에요. 『구장산술』은 중국 고대 수학책, 『주해수용』은 홍대용, 『산학계몽』은 원나라 주세걸의 책입니다.` },
+  { id:'c2', who:'최석정', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`최석정이 만든 직교라틴방진은 이를 연구한 한 서양 수학자보다 수십 년 앞선 것으로 평가받습니다. 이 수학자는?`,
+    choices:['오일러','가우스','뉴턴','파스칼','페르마'],
+    sol:r`오일러는 18세기 후반에 직교라틴방진을 연구했어요. 최석정의 방진은 그보다 앞선 것으로 알려져 있어요.` },
+  { id:'c3', who:'최석정', kind:'계산', unit:'경우의 수', type:'short', ans:15,
+    q:r`$1$부터 $9$까지의 수를 $3\times3$ 칸에 한 번씩 넣어 가로, 세로, 대각선의 합이 모두 같게 만든 마방진이 있습니다. 한 줄의 합은?`,
+    sol:r`$1+2+\cdots+9=45$를 세 줄이 똑같이 나누므로 $45\div3=15$` },
+
+  { id:'ra1', who:'라마누잔', kind:'이야기+계산', unit:'수와 연산', type:'short', ans:1729,
+    q:r`병문안 온 하디가 ‘택시 번호가 재미없는 수였다’고 하자, 라마누잔은 두 세제곱수의 합으로 두 가지 방법으로 나타낼 수 있는 가장 작은 수라며 반가워했습니다. $9^3+10^3$의 값은?`,
+    sol:r`$729+1000=1729$. 또 $1^3+12^3=1+1728=1729$이기도 해요.` },
+  { id:'ra2', who:'라마누잔', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`인도의 무명 청년 라마누잔의 편지를 받고 재능을 알아봐 영국 케임브리지로 초청한 수학자는?`,
+    choices:['하디','힐베르트','튜링','러셀','괴델'],
+    sol:r`영국 수학자 G. H. 하디예요. 두 사람은 함께 많은 논문을 남겼어요.` },
+  { id:'ra3', who:'라마누잔', kind:'계산', unit:'소인수분해', type:'short', ans:19,
+    q:r`$1729$를 소인수분해할 때 가장 큰 소인수는?`,
+    sol:r`$1729=7\times13\times19$이므로 가장 큰 소인수는 $19$` },
+
+  // ── 수학자별 4, 5번째 문제 ──
+  { id:'t4', who:'탈레스', kind:'계산', unit:'삼각형의 성질', type:'short', ans:70,
+    q:r`‘이등변삼각형의 두 밑각의 크기는 같다’는 탈레스가 증명했다고 전해집니다. 꼭지각이 $40^\circ$인 이등변삼각형의 한 밑각의 크기는 몇 도일까요?`,
+    sol:r`$(180^\circ-40^\circ)\div2=70^\circ$` },
+  { id:'t5', who:'탈레스', kind:'계산', unit:'원의 성질', type:'short', ans:5,
+    q:r`삼각형 $\mathrm{ABC}$가 원에 내접하고 변 $\mathrm{AB}$가 원의 지름입니다. $\overline{\mathrm{AC}}=6$, $\overline{\mathrm{BC}}=8$일 때 원의 반지름의 길이는?`,
+    sol:r`탈레스의 정리로 $\angle\mathrm{C}=90^\circ$. 빗변 $\overline{\mathrm{AB}}=\sqrt{36+64}=10$이 지름이므로 반지름은 $5$` },
+
+  { id:'p4', who:'피타고라스', kind:'계산', unit:'피타고라스 정리', type:'mc', ans:2,
+    q:r`한 변의 길이가 $4$인 정삼각형의 높이는?`,
+    choices:['2',r`$2\sqrt{2}$`,r`$2\sqrt{3}$`,'4',r`$4\sqrt{3}$`],
+    sol:r`높이는 밑변을 이등분하므로 $\sqrt{4^2-2^2}=\sqrt{12}=2\sqrt{3}$` },
+  { id:'p5', who:'피타고라스', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`피타고라스학파는 음악에서도 수의 비를 찾았습니다. 팽팽한 현의 길이를 절반으로 줄이면 나는 소리는?`,
+    choices:['한 옥타브 높은 소리','한 옥타브 낮은 소리','같은 높이의 소리','5도 낮은 소리','소리가 나지 않는다'],
+    sol:r`현의 길이 비가 $2:1$이면 한 옥타브 높은 소리가 나요. 아름다운 화음이 간단한 정수비에서 나온다는 발견이었습니다.` },
+
+  { id:'u4', who:'유클리드', kind:'계산', unit:'다각형', type:'short', ans:540,
+    q:r`『원론』은 삼각형의 내각의 합이 $180^\circ$임을 증명합니다. 이를 이용하면 오각형의 내각의 합은 몇 도일까요?`,
+    sol:r`오각형은 대각선으로 삼각형 $3$개로 나뉘므로 $180^\circ\times3=540^\circ$` },
+  { id:'u5', who:'유클리드', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`‘기하학을 쉽게 배우는 방법은 없느냐’는 질문에 유클리드가 ‘기하학에는 왕도가 없습니다’라고 답했다고 전해집니다. 질문한 사람은?`,
+    choices:['프톨레마이오스 1세','알렉산드로스 대왕','율리우스 카이사르','클레오파트라','페리클레스'],
+    sol:r`이집트의 왕 프톨레마이오스 1세에게 한 말로 전해져요. 5세기 학자 프로클로스가 남긴 일화입니다.` },
+
+  { id:'a4', who:'아르키메데스', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`‘나에게 설 자리를 준다면 지구를 움직여 보이겠다.’ 아르키메데스가 이 말에서 자신한 원리는?`,
+    choices:['지레의 원리','부력의 원리','만유인력','관성의 법칙','원심력'],
+    sol:r`충분히 긴 지레와 받침점만 있으면 작은 힘으로 무거운 물체를 들 수 있다는 뜻이에요.` },
+  { id:'a5', who:'아르키메데스', kind:'계산', unit:'수와 연산', type:'mc', ans:1,
+    q:r`아르키메데스는 정$96$각형으로 $3\frac{10}{71}<\pi<3\frac{1}{7}$임을 보였습니다. 윗값 $3\frac{1}{7}$을 가분수로 나타내면?`,
+    choices:[r`$\frac{21}{7}$`,r`$\frac{22}{7}$`,r`$\frac{23}{7}$`,r`$\frac{25}{8}$`,r`$\frac{355}{113}$`],
+    sol:r`$3\frac{1}{7}=\frac{21+1}{7}=\frac{22}{7}\approx3.1429$. 지금도 원주율의 근삿값으로 자주 써요.` },
+
+  { id:'er4', who:'에라토스테네스', kind:'계산', unit:'원과 부채꼴', type:'short', ans:40000,
+    q:r`두 도시 사이의 거리가 $800\,\mathrm{km}$이고 햇빛의 각도 차이가 $7.2^\circ$라면, 지구의 둘레는 몇 $\mathrm{km}$일까요?`,
+    sol:r`$7.2^\circ$가 한 바퀴의 $\frac{1}{50}$이므로 $800\times50=40000\,\mathrm{km}$` },
+  { id:'er5', who:'에라토스테네스', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`에라토스테네스가 관장으로 일한, 고대 세계 최대의 도서관은?`,
+    choices:['알렉산드리아 도서관','아테네 아카데메이아','로마 원로원 도서관','바그다드 지혜의 집','페르가몬 도서관'],
+    sol:r`이집트 알렉산드리아의 도서관이에요. 유클리드도 이 도시에서 활동했어요.` },
+
+  { id:'fi4', who:'피보나치', kind:'계산', unit:'수열', type:'short', ans:20,
+    q:r`피보나치 수열 $1, 1, 2, 3, 5, 8, \cdots$의 첫째항부터 제$6$항까지의 합은?`,
+    sol:r`$1+1+2+3+5+8=20$. 제$8$항 $21$에서 $1$을 뺀 값과 같다는 성질도 있어요.` },
+  { id:'fi5', who:'피보나치', kind:'계산', unit:'수열', type:'mc', ans:3,
+    q:r`해바라기 씨앗이나 솔방울의 나선 개수에는 피보나치 수가 자주 나타납니다. 다음 중 피보나치 수가 아닌 것은?`,
+    choices:['13','21','34','45','89'],
+    sol:r`$\cdots, 21, 34, 55, 89, \cdots$이므로 $45$는 피보나치 수가 아니에요.` },
+
+  { id:'na4', who:'네이피어', kind:'계산', unit:'로그', type:'short', ans:5,
+    q:r`$\log_2 8+\log_3 9$의 값은?`,
+    sol:r`$2^3=8$, $3^2=9$이므로 $3+2=5$` },
+  { id:'na5', who:'네이피어', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`네이피어가 곱셈과 나눗셈을 쉽게 하려고 만든, 숫자가 새겨진 막대 모양의 계산 도구는?`,
+    choices:['네이피어의 막대','주판','계산자','파스칼린','천칭'],
+    sol:r`‘네이피어의 뼈’라고도 불려요. 계산자는 이후 로그를 이용해 다른 사람이 만든 도구입니다.` },
+
+  { id:'d4', who:'데카르트', kind:'계산', unit:'직선의 방정식', type:'mc', ans:2,
+    q:r`기울기가 $2$이고 $y$절편이 $-3$인 직선이 $x$축과 만나는 점의 $x$좌표는?`,
+    choices:['-3',r`$-\frac{3}{2}$`,r`$\frac{3}{2}$`,'3','2'],
+    sol:r`$y=2x-3$에 $y=0$을 넣으면 $x=\frac{3}{2}$` },
+  { id:'d5', who:'데카르트', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`데카르트가 1637년 『기하학』에서 쓰기 시작해 지금까지 이어진 수학 관습은?`,
+    choices:['미지수를 x, y, z로 나타내기','원주율을 π로 나타내기','등호 =를 쓰기','무한대를 ∞로 나타내기','적분 기호 ∫를 쓰기'],
+    sol:r`데카르트는 알파벳 끝 글자 $x, y, z$를 미지수로, 앞 글자 $a, b, c$를 상수로 썼어요.` },
+
+  { id:'f4', who:'페르마', kind:'계산', unit:'이차함수', type:'short', ans:4,
+    q:r`페르마는 미분이 나오기 전에 최댓값과 최솟값을 구하는 방법을 연구했습니다. $f(x)=-x^2+4x$의 최댓값은?`,
+    sol:r`$f(x)=-(x-2)^2+4$이므로 $x=2$에서 최댓값 $4$` },
+  { id:'f5', who:'페르마', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`페르마는 수학을 취미로 했습니다. 그의 실제 직업은?`,
+    choices:['법률가(판사)','의사','성직자','군인','상인'],
+    sol:r`툴루즈 의회의 법률가였어요. 연구 결과는 주로 다른 학자들과의 편지로 남겼습니다.` },
+
+  { id:'pa4', who:'파스칼', kind:'계산', unit:'확률', type:'mc', ans:2,
+    q:r`동전 $3$개를 동시에 던질 때, 앞면이 정확히 $2$개 나올 확률은?`,
+    choices:[r`$\frac{1}{8}$`,r`$\frac{1}{4}$`,r`$\frac{3}{8}$`,r`$\frac{1}{2}$`,r`$\frac{5}{8}$`],
+    sol:r`$\frac{{}_{3}\mathrm{C}_{2}}{2^3}=\frac{3}{8}$` },
+  { id:'pa5', who:'파스칼', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`파스칼이 세금 계산을 하던 아버지를 돕기 위해 19세 무렵 만든 계산기의 이름은?`,
+    choices:['파스칼린','에니악','주판','계산자','네이피어의 막대'],
+    sol:r`톱니바퀴로 덧셈과 뺄셈을 하는 기계 ‘파스칼린’이에요.` },
+
+  { id:'n4', who:'뉴턴', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`뉴턴이 1687년 운동 법칙과 만유인력의 법칙을 발표한 책은?`,
+    choices:['프린키피아','원론','방법서설','산반서','천구의 회전에 관하여'],
+    sol:r`『자연철학의 수학적 원리』, 줄여서 『프린키피아』예요. 『천구의 회전에 관하여』는 코페르니쿠스의 책입니다.` },
+  { id:'n5', who:'뉴턴', kind:'계산', unit:'미분', type:'short', ans:8,
+    q:r`수직선 위를 움직이는 점의 시각 $t$에서의 위치가 $x(t)=t^2+2t$입니다. $t=3$에서의 속도는?`,
+    sol:r`속도는 위치의 순간변화율이므로 $x'(t)=2t+2$, $x'(3)=8$` },
+
+  { id:'l4', who:'라이프니츠', kind:'계산', unit:'진법', type:'short', ans:10,
+    q:r`이진법의 수 $1010_{(2)}$를 십진법으로 나타내면?`,
+    sol:r`$1\times2^3+0\times2^2+1\times2+0=8+2=10$` },
+  { id:'l5', who:'라이프니츠', kind:'이야기', unit:'수학사', type:'mc', ans:2,
+    q:r`라이프니츠는 파스칼의 계산기를 개량한 기계를 만들었습니다. 이 기계가 할 수 있었던 계산은?`,
+    choices:['덧셈만','덧셈과 뺄셈만','곱셈과 나눗셈까지 사칙연산','미분','프로그램 실행'],
+    sol:r`톱니를 반복해 돌리는 방식으로 곱셈과 나눗셈까지 할 수 있었어요.` },
+
+  { id:'c4', who:'최석정', kind:'계산', unit:'수열', type:'short', ans:34,
+    q:r`$1$부터 $16$까지의 수를 $4\times4$ 칸에 한 번씩 넣어 만든 마방진에서 한 줄의 합은?`,
+    sol:r`$1+2+\cdots+16=\frac{16\times17}{2}=136$을 네 줄이 나누므로 $136\div4=34$` },
+  { id:'c5', who:'최석정', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`『구수략』에 실린, 거북 등 무늬처럼 육각형을 이어 붙여 각 육각형의 수의 합이 같게 만든 마방진의 이름은?`,
+    choices:['지수귀문도','하도','낙서','천상열차분야지도','혼천의'],
+    sol:r`‘지수귀문도’예요. 낙서는 중국 전설 속 거북 등에 새겨진 $3\times3$ 마방진이고, 천상열차분야지도는 조선의 천문도입니다.` },
+
+  { id:'e4', who:'오일러', kind:'계산', unit:'수열의 극한', type:'mc', ans:2,
+    q:r`오일러가 이름 붙인 수 $e$와 관련된 극한입니다. $\displaystyle\lim_{n\to\infty}\left(1+\frac{1}{n}\right)^n$의 값은?`,
+    choices:['1','2',r`$e$`,r`$\pi$`,r`$\infty$`],
+    sol:r`이 극한값이 자연상수 $e\approx2.718$로 정의돼요.` },
+  { id:'e5', who:'오일러', kind:'계산', unit:'그래프', type:'mc', ans:0,
+    q:r`쾨니히스베르크 다리 문제에서 나온 한붓그리기 조건입니다. 한붓그리기가 가능하려면 선이 홀수 개 모이는 점이 몇 개여야 할까요?`,
+    choices:['0개 또는 2개','1개','3개','4개 이상','상관없다'],
+    sol:r`홀수점이 $0$개면 출발점으로 돌아오고, $2$개면 한 홀수점에서 출발해 다른 홀수점에서 끝나요. 쾨니히스베르크는 홀수점이 $4$개라 불가능했어요.` },
+
+  { id:'g4', who:'가우스', kind:'계산', unit:'가우스 기호', type:'short', ans:6,
+    q:r`$[x]$가 $x$보다 크지 않은 최대의 정수일 때, $[\log_2 100]$의 값은?`,
+    sol:r`$2^6=64\le100<128=2^7$이므로 $6\le\log_2 100<7$, 답은 $6$` },
+  { id:'g5', who:'가우스', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`1801년 발견 직후 사라진 천체의 위치를 가우스가 계산으로 예측해, 천문학자들이 다시 찾아냈습니다. 이 천체는?`,
+    choices:['세레스','핼리 혜성','해왕성','명왕성','천왕성'],
+    sol:r`왜행성 세레스예요. 해왕성은 1846년 르베리에 등의 계산으로 발견됐어요.` },
+
+  { id:'ra4', who:'라마누잔', kind:'이야기', unit:'수학사', type:'mc', ans:0,
+    q:r`라마누잔의 삶을 그린 2015년 영화의 제목은?`,
+    choices:['무한대를 본 남자','뷰티풀 마인드','이미테이션 게임','굿 윌 헌팅','히든 피겨스'],
+    sol:r`『무한대를 본 남자』예요. 『뷰티풀 마인드』는 존 내쉬, 『이미테이션 게임』은 앨런 튜링의 이야기입니다.` },
+  { id:'ra5', who:'라마누잔', kind:'계산', unit:'경우의 수', type:'short', ans:5,
+    q:r`라마누잔은 자연수를 자연수의 합으로 나누는 방법의 수(분할수)를 연구했습니다. $4$를 순서를 생각하지 않고 자연수의 합으로 나타내는 방법은 몇 가지일까요?`,
+    sol:r`$4$, $3+1$, $2+2$, $2+1+1$, $1+1+1+1$로 $5$가지` },
+];
+
+const LABELS = ['①','②','③','④','⑤'];
+const CIRCLE = 'M50 7C79 5 95 29 93 54C90 82 61 96 38 91C15 86 4 61 9 38C14 17 35 5 60 9';
+const SLASH = 'M18 88L84 10';
+const STORE = 'dongeurami-mathematicians-wrong';
+const byId = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
+const $ = s => document.querySelector(s);
+
+let filter = '탈레스';
+let deck = [];
+let idx = 0;
+let results = {};
+
+function loadWrong() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORE) || '[]')); } catch { return new Set(); }
+}
+function saveWrong(set) {
+  try { localStorage.setItem(STORE, JSON.stringify([...set])); } catch {}
+}
+function mark(kind, small) {
+  return `<svg class="mark${small ? ' small' : ''}" viewBox="0 0 100 100" aria-hidden="true"><path pathLength="1" d="${kind === 'ok' ? CIRCLE : SLASH}"/></svg>`;
+}
+function fmt(c) { return /^[-\d.\s]+$/.test(c) ? `$${c}$` : c; }
+function esc(s) { return s.replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])); }
+function typeset(el) {
+  const mj = window.MathJax;
+  if (mj && mj.typesetPromise) mj.typesetPromise([el]).catch(() => {});
+}
+
+function renderChips() {
+  const wrong = loadWrong();
+  const opts = ['전체', ...Object.keys(PEOPLE), '오답노트'];
+  $('#chips').innerHTML = opts.map(o => {
+    const n = o === '전체' ? QUESTIONS.length : o === '오답노트' ? wrong.size : QUESTIONS.filter(q => q.who === o).length;
+    return `<button class="chip" type="button" data-f="${o}" aria-pressed="${o === filter}">${o}<span class="n">${n}</span></button>`;
+  }).join('');
+}
+
+function renderWho() {
+  const p = PEOPLE[filter];
+  $('#who').innerHTML = p
+    ? `<b>${filter}</b><span class="yr">${p.yr}</span><p>${p.intro}</p>`
+    : filter === '전체'
+      ? `<b>전체 수학자</b><span class="yr">${QUESTIONS.length}문제</span><p>${Object.keys(PEOPLE).length}명의 수학자 문제를 시대순으로 풀어요.</p>`
+      : `<b>오답노트</b><p>틀린 문제가 모여 있어요. 다시 맞히면 오답노트에서 빠집니다.</p>`;
+}
+
+function startDeck(ids) {
+  deck = ids; idx = 0; results = {};
+  renderChips(); renderWho(); render();
+}
+function deckFor(f) {
+  if (f === '전체') return Object.keys(PEOPLE).flatMap(w => QUESTIONS.filter(q => q.who === w).map(q => q.id));
+  if (f === '오답노트') return QUESTIONS.filter(q => loadWrong().has(q.id)).map(q => q.id);
+  return QUESTIONS.filter(q => q.who === f).map(q => q.id);
+}
+
+function renderDots() {
+  $('#dots').innerHTML = deck.map((id, i) => {
+    const res = results[id];
+    const cls = res ? (res.correct ? 'ok' : 'no') : (i === idx ? 'now' : '');
+    return `<span class="dot ${cls}">${i + 1}</span>`;
+  }).join('');
+}
+
+function render() {
+  renderDots();
+  const stage = $('#stage');
+  if (!deck.length) {
+    stage.innerHTML = `<div class="card"><p class="empty">오답노트가 비어 있어요. 문제를 풀다 틀리면 여기에 모입니다.</p>
+      <div class="row"><button class="btn" type="button" data-act="all">전체 문제 풀기</button></div></div>`;
+    return;
+  }
+  stage.innerHTML = idx < deck.length ? questionHTML(byId[deck[idx]]) : summaryHTML();
+  typeset(stage);
+  const inp = $('#short-answer');
+  if (inp && !results[deck[idx]]) inp.focus({ preventScroll: true });
+}
+
+function questionHTML(q) {
+  const res = results[q.id];
+  const done = !!res;
+  let body;
+  if (q.type === 'mc') {
+    body = `<ol class="choices">${q.choices.map((c, i) => {
+      let cls = '', m = '';
+      if (done) {
+        if (i === q.ans) { cls = 'right'; m = mark('ok', true); }
+        else if (i === res.picked) { cls = 'picked-wrong'; m = mark('no', true); }
+        else cls = 'dim';
+      }
+      return `<li><button class="choice ${cls}" type="button" data-pick="${i}" ${done ? 'disabled' : ''}>
+        <span class="lab">${LABELS[i]}${m}</span><span>${fmt(c)}</span></button></li>`;
+    }).join('')}</ol>`;
+  } else {
+    body = `<form class="short" id="short-form">
+      <label for="short-answer" class="hint">답을 숫자로 입력하세요</label>
+      <input id="short-answer" inputmode="numeric" autocomplete="off" ${done ? `value="${esc(res.picked)}" disabled` : ''}>
+      ${done ? '' : '<button class="btn" type="submit">확인</button>'}
+    </form>`;
+  }
+  const last = idx === deck.length - 1;
+  const feedback = done ? `
+    <p class="verdict ${res.correct ? 'ok' : ''}" role="status">${res.correct ? '정답이에요!' :
+      `아쉬워요. 정답은 ${q.type === 'mc' ? LABELS[q.ans] : q.ans}`}</p>
+    <div class="sol"><span class="k">해설</span>${q.sol}</div>
+    <div class="row"><button class="btn" type="button" data-act="next" id="next-btn">${last ? '결과 보기' : '다음 문제 →'}</button></div>` : '';
+  return `<article class="card">
+    <div class="qhead">
+      <div class="qnum">${idx + 1}${done ? mark(res.correct ? 'ok' : 'no') : ''}</div>
+      <div>
+        <div class="meta"><span>${q.who}</span><span>·</span><span>${q.unit}</span><span class="tag">${q.kind}</span><span class="tag">${q.type === 'mc' ? '5지선다' : '단답형'}</span></div>
+        <p class="qtext">${q.q}</p>
+      </div>
+    </div>
+    ${body}
+    ${feedback}
+  </article>`;
+}
+
+function summaryHTML() {
+  const total = deck.length;
+  const right = deck.filter(id => results[id]?.correct).length;
+  const wrongIds = deck.filter(id => !results[id]?.correct);
+  const msg = right === total ? '전부 맞혔어요. 다른 수학자에도 도전해 보세요.'
+    : right / total >= 0.7 ? '잘했어요. 틀린 문제만 한 번 더 보세요.'
+    : '해설을 읽고 다시 풀어 봐요.';
+  return `<article class="card">
+    <div class="score"><span class="big">${right} / ${total}${mark('ok')}</span><p>${msg}</p></div>
+    ${wrongIds.length ? `<ul class="wrong-list">${wrongIds.map(id => {
+      const q = byId[id];
+      return `<li><div class="meta"><span>${q.who}</span><span>·</span><span>${q.unit}</span></div>${q.q}</li>`;
+    }).join('')}</ul>` : ''}
+    <div class="row">
+      ${wrongIds.length ? '<button class="btn ghost" type="button" data-act="retry-wrong">틀린 문제만 다시</button>' : ''}
+      <button class="btn" type="button" data-act="restart">처음부터 다시</button>
+    </div>
+  </article>`;
+}
+
+function answer(value) {
+  const q = byId[deck[idx]];
+  if (results[q.id]) return;
+  let correct, picked;
+  if (q.type === 'mc') { picked = value; correct = value === q.ans; }
+  else {
+    picked = String(value).trim();
+    if (!picked) return;
+    correct = Number(picked.replace(/,/g, '')) === q.ans;
+  }
+  results[q.id] = { correct, picked };
+  const wrong = loadWrong();
+  correct ? wrong.delete(q.id) : wrong.add(q.id);
+  saveWrong(wrong);
+  renderChips();
+  render();
+  $('#next-btn')?.focus({ preventScroll: true });
+}
+
+function next() {
+  idx += 1;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.addEventListener('click', e => {
+  const chip = e.target.closest('[data-f]');
+  if (chip) { filter = chip.dataset.f; startDeck(deckFor(filter)); return; }
+  const pick = e.target.closest('[data-pick]');
+  if (pick && !pick.disabled) { answer(Number(pick.dataset.pick)); return; }
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if (act === 'next') next();
+  if (act === 'restart') startDeck(deckFor(filter));
+  if (act === 'retry-wrong') startDeck(deck.filter(id => !results[id]?.correct));
+  if (act === 'all') { filter = '전체'; startDeck(deckFor(filter)); }
+});
+
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'short-form') return;
+  e.preventDefault();
+  answer($('#short-answer').value);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const q = byId[deck[idx]];
+  if (!q) return;
+  if (q.type === 'mc' && !results[q.id] && /^[1-5]$/.test(e.key)) answer(Number(e.key) - 1);
+  else if (e.key === 'Enter' && results[q.id] && !e.target.closest('button')) next();
+});
+
+startDeck(deckFor(filter));
+</script>
+
+</body>
+</html>

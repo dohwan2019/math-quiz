@@ -143,9 +143,9 @@ mjx-container{color:inherit}
 
 <div class="wrap">
   <header>
-    <span class="eyebrow">고등 수학 · 수학자별 퀴즈</span>
+    <span class="eyebrow">고등 수학 · 수학자별 퀴즈 · 성경 속 수학</span>
     <h1>이레 수학</h1>
-    <p class="lead">매주 월요일 새 수학자 두 명의 문제가 나와요. 바로 채점하고, 틀린 문제는 오답노트에 모입니다.</p>
+    <p class="lead">매주 월요일 새 수학자 두 명과 성경 속 수학 문제가 나와요. 바로 채점하고, 틀린 문제는 오답노트에 모입니다.</p>
   </header>
 
   <nav class="chips" id="chips" aria-label="수학자 선택"></nav>
@@ -514,7 +514,76 @@ const QUESTIONS = [
   { id:'ra5', who:'라마누잔', kind:'계산', unit:'경우의 수', type:'short', ans:5,
     q:r`라마누잔은 자연수를 자연수의 합으로 나누는 방법의 수(분할수)를 연구했습니다. $4$를 순서를 생각하지 않고 자연수의 합으로 나타내는 방법은 몇 가지일까요?`,
     sol:r`$4$, $3+1$, $2+2$, $2+1+1$, $1+1+1+1$로 $5$가지` },
+
+  // ── 성경 속 수학 (1규빗은 약 45cm로 계산) ──
+  { id:'b1', who:'성경', kind:'계산', unit:'입체도형', type:'short', ans:450000,
+    q:r`노아의 방주는 길이 $300$규빗, 너비 $50$규빗, 높이 $30$규빗이었습니다(창세기 6:15). 방주를 직육면체로 볼 때 부피는 몇 세제곱규빗일까요?`,
+    sol:r`$300\times50\times30=450000$ 세제곱규빗` },
+  { id:'b2', who:'성경', kind:'계산', unit:'단위 변환', type:'short', ans:135,
+    q:r`1규빗(팔꿈치에서 가운뎃손가락 끝까지의 길이)을 $45\,\mathrm{cm}$로 할 때, 길이가 $300$규빗인 노아의 방주는 몇 $\mathrm{m}$일까요?`,
+    sol:r`$300\times45=13500\,\mathrm{cm}=135\,\mathrm{m}$. 축구장 길이보다 조금 더 길어요.` },
+  { id:'b3', who:'성경', kind:'계산', unit:'원', type:'mc', ans:1,
+    q:r`솔로몬 성전의 ‘놋바다’는 지름이 $10$규빗, 둘레가 $30$규빗으로 기록되어 있습니다(열왕기상 7:23). $\pi=3.14$로 계산하면 지름이 $10$규빗인 원의 둘레는?`,
+    choices:['30','31.4','15.7','20','314'],
+    sol:r`$10\times3.14=31.4$규빗. (둘레)$\div$(지름)이 원주율이에요. 성경의 $30$은 어림한 값으로 볼 수 있어요.` },
+  { id:'b4', who:'성경', kind:'계산', unit:'수열', type:'short', ans:17,
+    q:r`부활하신 예수님을 만난 날 제자들이 잡은 물고기는 $153$마리였습니다(요한복음 21:11). $1+2+3+\cdots+n=153$일 때 $n$의 값은?`,
+    sol:r`$\frac{n(n+1)}{2}=153$에서 $n(n+1)=306=17\times18$이므로 $n=17$. $153$은 삼각수예요.` },
+  { id:'b5', who:'성경', kind:'계산', unit:'수와 연산', type:'short', ans:100,
+    q:r`오병이어의 기적 때 예수님은 약 $5000$명을 $50$명씩 무리 지어 앉게 하셨습니다(누가복음 9:14). 모두 몇 무리일까요?`,
+    sol:r`$5000\div50=100$무리` },
+  { id:'b6', who:'성경', kind:'계산', unit:'수와 연산', type:'short', ans:490,
+    q:r`몇 번까지 용서해야 하느냐는 베드로의 질문에 예수님은 ‘일곱 번을 일흔 번까지’라고 답하셨습니다(마태복음 18:22). $70\times7$의 값은?`,
+    sol:r`$490$. 횟수를 세지 말고 끝없이 용서하라는 뜻이에요.` },
+  { id:'b7', who:'성경', kind:'계산', unit:'수와 연산', type:'short', ans:13,
+    q:r`이스라엘 백성은 여리고 성을 $6$일 동안 하루에 한 바퀴씩 돌고, 일곱째 날에는 일곱 바퀴를 돌았습니다(여호수아 6장). 모두 몇 바퀴를 돌았을까요?`,
+    sol:r`$6\times1+7=13$바퀴` },
+  { id:'b8', who:'성경', kind:'계산', unit:'수와 연산', type:'short', ans:20,
+    q:r`야곱은 두 아내를 위해 $7$년씩 두 번, 그 뒤 양 떼를 위해 $6$년을 일했다고 말합니다(창세기 31:41). 모두 몇 년일까요?`,
+    sol:r`$7\times2+6=20$년` },
+  { id:'b9', who:'성경', kind:'계산', unit:'소인수분해', type:'short', ans:19,
+    q:r`성경에서 가장 오래 산 사람인 므두셀라는 $969$세까지 살았습니다(창세기 5:27). $969$를 소인수분해할 때 가장 큰 소인수는?`,
+    sol:r`$969=3\times17\times19$이므로 가장 큰 소인수는 $19$` },
+  { id:'b10', who:'성경', kind:'계산', unit:'지수', type:'short', ans:50,
+    q:r`희년은 안식년($7$년 주기)이 일곱 번 지난 다음 해입니다(레위기 25:8–10). $7^2+1$의 값은?`,
+    sol:r`$7^2=49$년이 지난 다음 해이므로 $50$년째가 희년이에요.` },
+  { id:'b11', who:'성경', kind:'계산', unit:'비와 비율', type:'mc', ans:0,
+    q:r`기드온의 군사는 처음 $32000$명이었지만 하나님은 $300$명만 남기셨습니다(사사기 7장). $300$명은 처음 인원의 몇 %일까요?`,
+    choices:['0.9375%','9.375%','3%','1%','0.3%'],
+    sol:r`$\frac{300}{32000}\times100=0.9375$(%). $100$명 중 $1$명도 안 되는 적은 수로 이긴 거예요.` },
+  { id:'b12', who:'성경', kind:'계산', unit:'비와 비율', type:'short', ans:100,
+    q:r`달란트 비유에서 $5$달란트를 받은 종은 $5$달란트를 더 벌어 $10$달란트를 만들었습니다(마태복음 25:16). 처음보다 몇 % 늘었을까요?`,
+    sol:r`$\frac{10-5}{5}\times100=100$(%)` },
+  { id:'b13', who:'성경', kind:'계산', unit:'경우의 수', type:'short', ans:66,
+    q:r`예수님은 열두 제자를 둘씩 짝지어 보내셨습니다(마가복음 6:7). $12$명 중 $2$명을 뽑는 방법의 수는?`,
+    sol:r`$_{12}\mathrm{C}_{2}=\frac{12\times11}{2}=66$` },
+  { id:'b14', who:'성경', kind:'계산', unit:'입체도형', type:'short', ans:144000,
+    q:r`요한계시록의 새 예루살렘은 길이, 너비, 높이가 모두 $12000$스타디온으로 기록되어 있습니다(요한계시록 21:16). 정육면체로 볼 때 모든 모서리 길이의 합은 몇 스타디온일까요?`,
+    sol:r`정육면체의 모서리는 $12$개이므로 $12\times12000=144000$스타디온` },
+  { id:'b15', who:'성경', kind:'계산', unit:'단위 변환', type:'short', ans:292,
+    q:r`골리앗의 키는 ‘$6$규빗 한 뼘’이었습니다(사무엘상 17:4). $1$규빗을 $45\,\mathrm{cm}$, 한 뼘을 $22\,\mathrm{cm}$로 할 때 몇 $\mathrm{cm}$일까요?`,
+    sol:r`$6\times45+22=292\,\mathrm{cm}$. 약 $2.9\,\mathrm{m}$예요.` },
+  { id:'b16', who:'성경', kind:'계산', unit:'입체도형', type:'short', ans:36000,
+    q:r`솔로몬 성전은 길이 $60$규빗, 너비 $20$규빗, 높이 $30$규빗이었습니다(열왕기상 6:2). 직육면체로 볼 때 부피는 몇 세제곱규빗일까요?`,
+    sol:r`$60\times20\times30=36000$ 세제곱규빗` },
+  { id:'b17', who:'성경', kind:'계산', unit:'어림', type:'mc', ans:0,
+    q:r`광야에서 인구조사를 했을 때 싸움에 나갈 수 있는 남자는 $603550$명이었습니다(민수기 1:46). 만의 자리에서 반올림하면?`,
+    choices:['600,000','603,000','604,000','610,000','700,000'],
+    sol:r`만의 자리 숫자가 $0$이므로 버려서 $600000$` },
+  { id:'b18', who:'성경', kind:'계산', unit:'나머지', type:'mc', ans:1,
+    q:r`한 주가 $7$일인 것은 창조 이야기(창세기 1–2장)에서 비롯된 전통입니다. 오늘이 일요일이면 $100$일 뒤는 무슨 요일일까요?`,
+    choices:['월요일','화요일','수요일','목요일','일요일'],
+    sol:r`$100=7\times14+2$이므로 일요일에서 $2$일 뒤인 화요일` },
+  { id:'b19', who:'성경', kind:'계산', unit:'나머지', type:'mc', ans:0,
+    q:r`노아의 홍수 때 물이 $150$일 동안 땅을 덮었습니다(창세기 7:24). $150$일은 몇 주 며칠일까요?`,
+    choices:['21주 3일','21주 1일','20주 3일','22주','15주'],
+    sol:r`$150=7\times21+3$이므로 $21$주 $3$일` },
+  { id:'b20', who:'성경', kind:'계산', unit:'비례', type:'short', ans:13,
+    q:r`느헤미야와 백성들은 예루살렘 성벽을 $52$일 만에 완성했습니다(느헤미야 6:15). 매일 같은 양을 쌓았다면 전체의 $\frac{1}{4}$을 쌓는 데 며칠이 걸렸을까요?`,
+    sol:r`$52\times\frac{1}{4}=13$일` },
 ];
+const BIBLE_IDS = QUESTIONS.filter(q => q.who === '성경').map(q => q.id);
+const PEOPLE_QUESTIONS = QUESTIONS.filter(q => q.who !== '성경');
 
 const LABELS = ['①','②','③','④','⑤'];
 const CIRCLE = 'M50 7C79 5 95 29 93 54C90 82 61 96 38 91C15 86 4 61 9 38C14 17 35 5 60 9';
@@ -547,6 +616,18 @@ function weekPeople(monday) {
   const w = Math.round((toUTC(monday) - toUTC(EPOCH_MONDAY)) / (7 * 864e5));
   const cycle = Math.floor(w / perCycle), pos = ((w % perCycle) + perCycle) % perCycle;
   return shuffle(names, rng(`math-week-cycle-${cycle}`)).slice(pos * WEEK_PEOPLE, pos * WEEK_PEOPLE + WEEK_PEOPLE);
+}
+// 이번 주 성경 속 수학 2문제 (20문제 ÷ 2 = 10주에 한 바퀴)
+const WEEK_BIBLE = 2;
+function weekBible(monday) {
+  const w = Math.round((toUTC(monday) - toUTC(EPOCH_MONDAY)) / (7 * 864e5));
+  const out = [];
+  for (let k = 0; k < WEEK_BIBLE; k++) {
+    const pos = w * WEEK_BIBLE + k;
+    const order = shuffle(BIBLE_IDS, rng(`math-bible-cycle-${Math.floor(pos / BIBLE_IDS.length)}`));
+    out.push(order.at(pos % BIBLE_IDS.length));
+  }
+  return out;
 }
 function loadDone() { try { return JSON.parse(localStorage.getItem(STORE_DONE) || '{}'); } catch { return {}; } }
 function saveDone(obj) { try { localStorage.setItem(STORE_DONE, JSON.stringify(obj)); } catch {} }
@@ -583,9 +664,9 @@ function typeset(el) {
 
 function renderChips() {
   const wrong = loadWrong();
-  const opts = ['이번 주', '전체', ...Object.keys(PEOPLE), '오답노트'];
+  const opts = ['이번 주', '전체', ...Object.keys(PEOPLE), '성경', '오답노트'];
   $('#chips').innerHTML = opts.map(o => {
-    const n = o === '이번 주' ? deckFor('이번 주').length : o === '전체' ? QUESTIONS.length : o === '오답노트' ? wrong.size : QUESTIONS.filter(q => q.who === o).length;
+    const n = o === '이번 주' ? deckFor('이번 주').length : o === '전체' ? PEOPLE_QUESTIONS.length : o === '오답노트' ? wrong.size : QUESTIONS.filter(q => q.who === o).length;
     return `<button class="chip" type="button" data-f="${o}" aria-pressed="${o === filter}">${o}<span class="n">${n}</span></button>`;
   }).join('');
 }
@@ -604,14 +685,20 @@ function renderWho() {
         ${s ? `<span class="streak">연속 ${s}주</span>` : ''}
       </div>
       <b>${viewWeek === THIS_WEEK ? '이번 주' : '그 주'}의 수학자: ${names.join(' · ')}</b>
-      ${names.map(n => `<p><strong>${n}</strong> (${PEOPLE[n].yr}) ${PEOPLE[n].intro}</p>`).join('')}`;
+      ${names.map(n => `<p><strong>${n}</strong> (${PEOPLE[n].yr}) ${PEOPLE[n].intro}</p>`).join('')}
+      <p><strong>성경 속 수학</strong> ${WEEK_BIBLE}문제가 함께 나와요.</p>`;
+    return;
+  }
+  if (filter === '성경') {
+    $('#who').innerHTML = `<b>성경 속 수학</b><span class="yr">${BIBLE_IDS.length}문제</span>
+      <p>노아의 방주, 오병이어처럼 성경에 나오는 숫자로 푸는 문제예요. 1규빗은 약 45cm로 계산해요.</p>`;
     return;
   }
   const p = PEOPLE[filter];
   $('#who').innerHTML = p
     ? `<b>${filter}</b><span class="yr">${p.yr}</span><p>${p.intro}</p>`
     : filter === '전체'
-      ? `<b>전체 수학자</b><span class="yr">${QUESTIONS.length}문제</span><p>${Object.keys(PEOPLE).length}명의 수학자 문제를 시대순으로 풀어요.</p>`
+      ? `<b>전체 수학자</b><span class="yr">${PEOPLE_QUESTIONS.length}문제</span><p>${Object.keys(PEOPLE).length}명의 수학자 문제를 시대순으로 풀어요.</p>`
       : `<b>오답노트</b><p>틀린 문제가 모여 있어요. 다시 맞히면 오답노트에서 빠집니다.</p>`;
 }
 
@@ -620,7 +707,7 @@ function startDeck(ids) {
   renderChips(); renderWho(); render();
 }
 function deckFor(f) {
-  if (f === '이번 주') return weekPeople(viewWeek).flatMap(w => QUESTIONS.filter(q => q.who === w).map(q => q.id));
+  if (f === '이번 주') return weekPeople(viewWeek).flatMap(w => QUESTIONS.filter(q => q.who === w).map(q => q.id)).concat(weekBible(viewWeek));
   if (f === '전체') return Object.keys(PEOPLE).flatMap(w => QUESTIONS.filter(q => q.who === w).map(q => q.id));
   if (f === '오답노트') return QUESTIONS.filter(q => loadWrong().has(q.id)).map(q => q.id);
   return QUESTIONS.filter(q => q.who === f).map(q => q.id);
